@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 
 class Home extends StatefulWidget {
@@ -8,6 +9,9 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+
+  var user = FirebaseAuth.instance.currentUser;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -16,14 +20,27 @@ class _HomeState extends State<Home> {
         centerTitle: true,
         backgroundColor: Colors.blue[900],
       ),
-      body: displayProjectsWidget(),
+      body: Column (
+        children: [
+          Text(user!.uid),
+          ElevatedButton(
+            onPressed: () => FirebaseAuth.instance.signOut(), 
+            child: const Text('Logout'),
+          ),
+          Expanded(
+            child: displayProjectsWidget(),
+          ),
+        ],
+      ) 
+      
     );
   }
 }
 
 Future<List<dynamic>> fetchProjects() async {
+  var user = FirebaseAuth.instance.currentUser;
   const BASE_API_URL = String.fromEnvironment('BASE_API_URL', defaultValue: '');
-  var result = await http.get(Uri.parse("${BASE_API_URL}projects/4CJkhMgOeOWxo5qnNQfthUyJneV2"));
+  var result = await http.get(Uri.parse("${BASE_API_URL}projects/${user!.uid}"));
   return jsonDecode(result.body);
 }
 
