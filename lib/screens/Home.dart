@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:taskit_mobile/screens/ProjectDetails.dart';
 import 'package:http/http.dart' as http;
 
 class Home extends StatefulWidget {
@@ -49,12 +50,23 @@ displayProjectsWidget() {
     future: fetchProjects(),
     builder: (BuildContext context, AsyncSnapshot snapshot) {
       if (snapshot.hasData) {
+        if (snapshot.data.length == 0) {
+          return Center(child: Text('No projects found'));
+        }
         return ListView.builder(
           itemCount: snapshot.data.length,
           itemBuilder: (BuildContext context, int index) {
             return ListTile(
               title: Text(snapshot.data[index]['title']),
               subtitle: Text(snapshot.data[index]['description']),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ProjectDetails(snapshot.data[index]),
+                  ),
+                );
+              },
             );
           },
         );
