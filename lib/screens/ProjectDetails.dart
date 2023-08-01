@@ -117,7 +117,7 @@ class _ProjectDetailsState extends State<ProjectDetails> {
   card(task) {
     return Card(
       elevation: 2,
-      color: Color.fromARGB(220, 255, 255, 255),
+      color: Colors.deepPurple[50],
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
