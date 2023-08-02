@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
@@ -47,6 +48,10 @@ class _LoginState extends State<Login> {
                 },
                 child: const Text('Login'),
               ),
+              ElevatedButton(
+                onPressed: () {signInWithGoogle();},
+                child: const Text('Continue with Google'),
+              ),
             ],
           ),
         ));
@@ -63,6 +68,19 @@ class _LoginState extends State<Login> {
       final snackBar = SnackBar(content: Text('Sign-in failed. Please check your credentials.'));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
+  }
+
+  Future<UserCredential> signInWithGoogle() async {
+    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+    final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
+
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth?.accessToken,
+      idToken: googleAuth?.idToken,
+    );
+    var userCredentials =  await FirebaseAuth.instance.signInWithCredential(credential);
+    print(userCredentials.user?.uid);
+    return userCredentials;
   }
 }
 
