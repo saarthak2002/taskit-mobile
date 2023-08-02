@@ -32,8 +32,6 @@ class _ProjectDetailsState extends State<ProjectDetails> {
       taskCategoryNames.add(data['task_categories'][i]['name']);
       taskCategoryColorMap[data['task_categories'][i]['name']] = data['task_categories'][i]['color'];
     }
-    print(taskCategoryNames);
-    print(taskCategoryColorMap);
     dropdownTaskCategoryValue = taskCategoryNames[0];
   }
   
@@ -285,7 +283,7 @@ class _ProjectDetailsState extends State<ProjectDetails> {
         "completed_by" : completed_by,
       }),
     );
-
+    print(reponse.body);
     setState(() {
       tasks = fetchTasks();
       isUpdatingTasks = false;
@@ -306,7 +304,7 @@ class _ProjectDetailsState extends State<ProjectDetails> {
       body: jsonEncode(<String, String>{
       }),
     );
-
+    print(reponse.body);
     setState(() {
       tasks = fetchTasks();
       isUpdatingTasks = false;
