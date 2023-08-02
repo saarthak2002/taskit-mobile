@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:taskit_mobile/extentions.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class ProjectDetails extends StatefulWidget {
   final data;
@@ -18,6 +19,10 @@ class _ProjectDetailsState extends State<ProjectDetails> {
   List<String> taskCategoryNames = [];
   Map taskCategoryColorMap = Map<String,String>();
   String dropdownTaskCategoryValue = '';
+
+  bool taskTitleError = false;
+  bool taskDescriptionError = false;
+
   @override
   void initState() {
     super.initState();
@@ -124,6 +129,7 @@ class _ProjectDetailsState extends State<ProjectDetails> {
                       labelText: 'Title',
                       hintText: 'Title',
                       fillColor: Colors.white70,
+                      errorText: taskTitleError ? 'Please enter a title' : null,
                     ),
                   ),
                 ),
@@ -141,6 +147,7 @@ class _ProjectDetailsState extends State<ProjectDetails> {
                       labelText: 'Description',
                       hintText: 'Description',
                       fillColor: Colors.white70,
+                      errorText: taskDescriptionError ? 'Please enter a description' : null,
                     ),
                   ),
                 ),
@@ -163,7 +170,6 @@ class _ProjectDetailsState extends State<ProjectDetails> {
                         icon: const Icon(Icons.arrow_downward),
                         onChanged: (String? newValue) {
                           setDropdownState(() {
-                            print(newValue);
                             dropdownTaskCategoryValue = newValue!;
                           });
                         },
@@ -183,7 +189,7 @@ class _ProjectDetailsState extends State<ProjectDetails> {
                   margin: EdgeInsets.only(top: 10),
                   child: ElevatedButton(
                     onPressed: () {
-                      addTask();
+                      addTask(context, setDropdownState);
                     },
                     child: Text('Add Task'),
                   ),
@@ -202,27 +208,81 @@ class _ProjectDetailsState extends State<ProjectDetails> {
     return jsonDecode(result.body);
   }
 
-  addTask() {
-    print('add task');
+  addTask(context, setDropdownState) async {
     String title = taskTitleController.text.trim();
     String description = taskDescriptionController.text.trim();
-    print(title);
-    print(description);
-    print(dropdownTaskCategoryValue);
+    if(title == '') {
+      setDropdownState(() {
+        taskTitleError = true;
+      });
+      return;
+    }
+    else {
+      setDropdownState(() {
+        taskTitleError = false;
+      });
+    }
+    if(description == '') {
+      setDropdownState(() {
+        taskDescriptionError = true;
+      });
+      return;
+    }
+    else {
+      setDropdownState(() {
+        taskDescriptionError = false;
+      });
+    }
+    Navigator.pop(context);
+    setState(() {
+      isUpdatingTasks = true;
+    });
+    var user = FirebaseAuth.instance.currentUser;
+    const BASE_API_URL = String.fromEnvironment('BASE_API_URL', defaultValue: '');
+    String taskCategoryColor = taskCategoryColorMap[dropdownTaskCategoryValue];
+    
+    final reponse = await http.post(
+      Uri.parse(BASE_API_URL + 'projects/${data['id']}/tasks'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        "title":title,
+        "description": description,
+        "task_category_name": dropdownTaskCategoryValue,
+        "task_category_color": taskCategoryColor,
+        "created_by_user_uid": user!.uid,
+      }),
+    );
+
+    print(reponse.body);
+    taskDescriptionController.clear();
+    taskTitleController.clear();
+    setState(() {
+      tasks = fetchTasks();
+      isUpdatingTasks = false;
+    });
   }
  
   markTaskAsComplete(id) async {
     setState(() {
       isUpdatingTasks = true;
     });
-    
+
+    var user = FirebaseAuth.instance.currentUser;
     const BASE_API_URL = String.fromEnvironment('BASE_API_URL', defaultValue: '');
+    var result = await http.get(Uri.parse("${BASE_API_URL}users/${user!.uid}"));
+    var decodedResult = jsonDecode(result.body);
+    
+    String completed_by = decodedResult['firstname'] + ' ' + decodedResult['lastname'];
+    
     final reponse = await http.post(
       Uri.parse(BASE_API_URL + 'task/${id}/complete'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
       body: jsonEncode(<String, String>{
+        "completed_by" : completed_by,
       }),
     );
 
