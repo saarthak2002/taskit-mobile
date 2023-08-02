@@ -80,6 +80,29 @@ Future fecthUserInfo() async {
   var user = FirebaseAuth.instance.currentUser;
   const BASE_API_URL = String.fromEnvironment('BASE_API_URL', defaultValue: '');
   var result = await http.get(Uri.parse("${BASE_API_URL}users/${user!.uid}"));
+  var decodedResponse = jsonDecode(result.body);
+
+  if(decodedResponse['error'] == 'User not found') {
+    print('User does not exist');
+    var firstName = user.displayName!.split(' ')[0];
+    var lastName = user.displayName!.split(' ')[1];
+    var userUid = user.uid;
+    var username = user.email!.split('@')[0] + user.uid.substring(0, 7);
+  
+    final response = await http.post(
+      Uri.parse("${BASE_API_URL}users"),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'firstName': firstName,
+        'lastName': lastName,
+        'userUID': userUid,
+        'username': username,
+      }),
+    );
+    print(response.body);
+  }
   return jsonDecode(result.body);
 }
 

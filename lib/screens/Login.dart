@@ -14,73 +14,107 @@ class _LoginState extends State<Login> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
+  bool loading = false;
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    if (loading) {
+      return Scaffold(
         appBar: AppBar(
           title: const Text('Login'),
           centerTitle: true,
           backgroundColor: Colors.blue[900],
         ),
-        body: Container(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            children: [
-              TextField(
-                controller: emailController,
-                decoration: const InputDecoration(
-                  labelText: 'Email',
-                  hintText: 'Email',
-                ),
+        body: const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Login'),
+        centerTitle: true,
+        backgroundColor: Colors.blue[900],
+      ),
+      body: Container(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          children: [
+            TextField(
+              controller: emailController,
+              decoration: const InputDecoration(
+                labelText: 'Email',
+                hintText: 'Email',
               ),
-              TextField(
-                controller: passwordController,
-                decoration: const InputDecoration(
-                  labelText: 'Password',
-                  hintText: 'Password',
-                ),
+            ),
+            TextField(
+              controller: passwordController,
+              decoration: const InputDecoration(
+                labelText: 'Password',
+                hintText: 'Password',
               ),
-              ElevatedButton(
-                onPressed: () {
-                  print(emailController.text);
-                  print(passwordController.text);
-                  signIn();
-                },
-                child: const Text('Login'),
-              ),
-              ElevatedButton(
-                onPressed: () {signInWithGoogle();},
-                child: const Text('Continue with Google'),
-              ),
-            ],
-          ),
-        ));
+            ),
+            ElevatedButton(
+              onPressed: () {
+                signIn();
+              },
+              child: const Text('Login'),
+            ),
+            ElevatedButton(
+              onPressed: () {signInWithGoogle();},
+              child: const Text('Continue with Google'),
+            ),
+          ],
+        ),
+      )
+    );
   }
 
   Future signIn() async {
+    setState(() {
+      loading = true;
+    });
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
+      setState(() {
+        loading = false;
+      });
     }
     catch(error) {
-      final snackBar = SnackBar(content: Text('Sign-in failed. Please check your credentials.'));
+      const snackBar = SnackBar(content: Text('Sign-in failed. Please check your credentials.'));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      setState(() {
+        loading = false;
+      });
     }
   }
 
   Future<UserCredential> signInWithGoogle() async {
-    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-    final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
+    setState(() {
+      loading = true;
+    });
+    try{
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
 
-    final credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth?.accessToken,
-      idToken: googleAuth?.idToken,
-    );
-    var userCredentials =  await FirebaseAuth.instance.signInWithCredential(credential);
-    print(userCredentials.user?.uid);
-    return userCredentials;
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth?.accessToken,
+        idToken: googleAuth?.idToken,
+      );
+      var userCredentials =  await FirebaseAuth.instance.signInWithCredential(credential);
+      return userCredentials;
+    }
+    catch (error) {
+      const snackBar = SnackBar(content: Text('Sign-in failed. Please check your credentials.'));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      setState(() {
+        loading = false;
+      });
+      rethrow;
+    }
   }
 }
 
