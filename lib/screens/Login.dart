@@ -37,54 +37,59 @@ class _LoginState extends State<Login> {
         centerTitle: true,
         backgroundColor: Colors.blue[900],
       ),
-      body: Container(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            Container(
-              margin: const EdgeInsets.only(bottom: 10),
-              child: TextField(
-                controller: emailController,
-                decoration: InputDecoration(
-                  labelText: 'Email',
-                  hintText: 'Email',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
+      body: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            children: [
+              Image.asset('assets/images/logo-nobg.png'),
+              Container(
+                margin: const EdgeInsets.only(top: 12,bottom: 10),
+                child: TextField(
+                  controller: emailController,
+                  decoration: InputDecoration(
+                    labelText: 'Email',
+                    hintText: 'Email',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white70,
                   ),
-                  filled: true,
-                  fillColor: Colors.white70,
                 ),
               ),
-            ),
-            Container(
-              margin: const EdgeInsets.only(bottom: 10),
-              child: TextField(
-                controller: passwordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: 'Password',
-                  hintText: 'Password',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
+              Container(
+                margin: const EdgeInsets.only(bottom: 10),
+                child: TextField(
+                  controller: passwordController,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    labelText: 'Password',
+                    hintText: 'Password',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white70,
                   ),
-                  filled: true,
-                  fillColor: Colors.white70,
                 ),
               ),
-            ),
-            SignInButton(
-              Buttons.Email,
-              text: "Login with Email",
-              onPressed: () {signIn();},
-            ),
-            SignInButton(
-              Buttons.GoogleDark,
-              text: "Continue with Google",
-              onPressed: () {signInWithGoogle();},
-            ),
-          ],
+              SignInButton(
+                Buttons.Email,
+                text: "Login with Email",
+                onPressed: () {signIn();},
+              ),
+              SignInButton(
+                Buttons.GoogleDark,
+                text: "Continue with Google",
+                onPressed: () {signInWithGoogle();},
+              ),
+            ],
+          ),
         ),
-      )
+      ),
     );
   }
 
