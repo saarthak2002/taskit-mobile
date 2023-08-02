@@ -14,9 +14,30 @@ class ProjectDetails extends StatefulWidget {
 class _ProjectDetailsState extends State<ProjectDetails> {
   final data;
   _ProjectDetailsState(this.data);
+
+  List<String> taskCategoryNames = [];
+  Map taskCategoryColorMap = Map<String,String>();
+  String dropdownTaskCategoryValue = '';
+  @override
+  void initState() {
+    super.initState();
+    taskCategoryNames.add('None');
+    taskCategoryColorMap['None'] = '#bab5b5';
+    for (var i = 0; i < data['task_categories'].length; i++) {
+      taskCategoryNames.add(data['task_categories'][i]['name']);
+      taskCategoryColorMap[data['task_categories'][i]['name']] = data['task_categories'][i]['color'];
+    }
+    print(taskCategoryNames);
+    print(taskCategoryColorMap);
+    dropdownTaskCategoryValue = taskCategoryNames[0];
+  }
   
   late Future<List<dynamic>> tasks = fetchTasks();
   bool isUpdatingTasks = false;
+
+  TextEditingController taskTitleController = TextEditingController();
+  TextEditingController taskDescriptionController = TextEditingController();
+   // default color bab5b5
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +59,140 @@ class _ProjectDetailsState extends State<ProjectDetails> {
           ],
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            useSafeArea: true,
+            builder: (BuildContext context) {
+              return (
+                StatefulBuilder(
+                  builder: (BuildContext context, StateSetter setDropdownState) {
+                    return addTaskModal(context, setDropdownState);
+                  },
+                )
+              );
+            }
+          );
+        },
+        backgroundColor: Colors.blue[900],
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+
+  addTaskModal(context, setDropdownState) {
+    return (
+      Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom
+        ),
+        child: Container (
+          height: 500,
+          child: Padding (
+            padding: EdgeInsets.all(20),
+            child: Column (
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Add Task To ${data['title']}',
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: Icon(Icons.close),
+                      tooltip: 'Close',
+                    ),
+                  ],
+                ),
+                Container(
+                  margin: const EdgeInsets.only(top: 20),
+                  child: TextField(
+                    controller: taskTitleController,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      filled: true,
+                      labelText: 'Title',
+                      hintText: 'Title',
+                      fillColor: Colors.white70,
+                    ),
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.only(top: 10),
+                  child: TextField(
+                    controller: taskDescriptionController,
+                    maxLines: 5,
+                    minLines: 3,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      filled: true,
+                      labelText: 'Description',
+                      hintText: 'Description',
+                      fillColor: Colors.white70,
+                    ),
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.only(top: 10),
+                  height: 60,
+                  child: InputDecorator(
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      filled: true,
+                      labelText: 'Task Category',
+                      hintText: 'Task Category',
+                      fillColor: Colors.white70,
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child:  DropdownButton(
+                        value: dropdownTaskCategoryValue,
+                        icon: const Icon(Icons.arrow_downward),
+                        onChanged: (String? newValue) {
+                          setDropdownState(() {
+                            print(newValue);
+                            dropdownTaskCategoryValue = newValue!;
+                          });
+                        },
+                        items: taskCategoryNames.map((String value) {
+                          return DropdownMenuItem(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                        dropdownColor: Colors.white,
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                    ),
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.only(top: 10),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      addTask();
+                    },
+                    child: Text('Add Task'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      )
     );
   }
 
@@ -47,6 +202,15 @@ class _ProjectDetailsState extends State<ProjectDetails> {
     return jsonDecode(result.body);
   }
 
+  addTask() {
+    print('add task');
+    String title = taskTitleController.text.trim();
+    String description = taskDescriptionController.text.trim();
+    print(title);
+    print(description);
+    print(dropdownTaskCategoryValue);
+  }
+ 
   markTaskAsComplete(id) async {
     setState(() {
       isUpdatingTasks = true;
