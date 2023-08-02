@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter_signin_button/flutter_signin_button.dart';
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
@@ -40,29 +41,46 @@ class _LoginState extends State<Login> {
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            TextField(
-              controller: emailController,
-              decoration: const InputDecoration(
-                labelText: 'Email',
-                hintText: 'Email',
+            Container(
+              margin: const EdgeInsets.only(bottom: 10),
+              child: TextField(
+                controller: emailController,
+                decoration: InputDecoration(
+                  labelText: 'Email',
+                  hintText: 'Email',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  filled: true,
+                  fillColor: Colors.white70,
+                ),
               ),
             ),
-            TextField(
-              controller: passwordController,
-              decoration: const InputDecoration(
-                labelText: 'Password',
-                hintText: 'Password',
+            Container(
+              margin: const EdgeInsets.only(bottom: 10),
+              child: TextField(
+                controller: passwordController,
+                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: 'Password',
+                  hintText: 'Password',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  filled: true,
+                  fillColor: Colors.white70,
+                ),
               ),
             ),
-            ElevatedButton(
-              onPressed: () {
-                signIn();
-              },
-              child: const Text('Login'),
+            SignInButton(
+              Buttons.Email,
+              text: "Login with Email",
+              onPressed: () {signIn();},
             ),
-            ElevatedButton(
+            SignInButton(
+              Buttons.GoogleDark,
+              text: "Continue with Google",
               onPressed: () {signInWithGoogle();},
-              child: const Text('Continue with Google'),
             ),
           ],
         ),
