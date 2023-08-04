@@ -389,15 +389,17 @@ class _ProjectDetailsState extends State<ProjectDetails> {
           children: [
             Row (
               children: [
-                Text(
-                  task['title'],
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
+                Expanded(
+                  child: Text(
+                    task['title'],
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
                   ),
                 ),
-                const Spacer(),
+                
                 Container(
                   decoration: BoxDecoration(
                     color: task['task_category_color'].toString().toColor(),
@@ -420,6 +422,18 @@ class _ProjectDetailsState extends State<ProjectDetails> {
                 task['description'],
                 style: const TextStyle(
                   fontSize: 16,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+
+            Align(
+              alignment: Alignment.topLeft,
+              child: Text(
+                task['status'] == 'completed' ? 'Completed by ${task['completed_by']}' : 'Created by ${task['created_by']}',
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w300,
                   color: Colors.black,
                 ),
               ),
