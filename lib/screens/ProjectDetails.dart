@@ -36,11 +36,11 @@ class _ProjectDetailsState extends State<ProjectDetails> {
   }
   
   late Future<List<dynamic>> tasks = fetchTasks();
+  late Future<dynamic> projectOwnerInfo = getProjectOwnerInfo();
   bool isUpdatingTasks = false;
 
   TextEditingController taskTitleController = TextEditingController();
   TextEditingController taskDescriptionController = TextEditingController();
-   // default color bab5b5
 
   @override
   Widget build(BuildContext context) {
@@ -54,8 +54,40 @@ class _ProjectDetailsState extends State<ProjectDetails> {
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            Text(data['title']),
-            Text(data['description']),
+            Text(
+              data['description'],
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w200,
+                color: Colors.black,
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.only(bottom: 10),
+              child: Align(
+                alignment: Alignment.center,
+                child: FutureBuilder(
+                  future: projectOwnerInfo,
+                  builder: (BuildContext context, AsyncSnapshot snapshot) {
+                    if (snapshot.hasData) {
+                      return Text(
+                        'by ${snapshot.data['firstname']} ${snapshot.data['lastname']}',
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w300,
+                          color: Colors.black,
+                        ),
+                      );
+                    }
+                    else {
+                      return const Text(
+                        '',
+                      );
+                    }
+                  },
+                ),
+              ),
+            ),
             Expanded(
               child: taskList(),
             ),
@@ -204,6 +236,14 @@ class _ProjectDetailsState extends State<ProjectDetails> {
     const BASE_API_URL = String.fromEnvironment('BASE_API_URL', defaultValue: '');
     var result = await http.get(Uri.parse("${BASE_API_URL}projects/${data['id']}/tasks"));
     return jsonDecode(result.body);
+  }
+
+  Future<dynamic> getProjectOwnerInfo() async {
+    var userUid = data['userUID'];
+    const BASE_API_URL = String.fromEnvironment('BASE_API_URL', defaultValue: '');
+    var result = await http.get(Uri.parse("${BASE_API_URL}users/$userUid"));
+    var decodedResponse = jsonDecode(result.body);
+    return decodedResponse;
   }
 
   addTask(context, setDropdownState) async {
