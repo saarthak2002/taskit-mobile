@@ -21,6 +21,7 @@ class _ProfileState extends State<Profile> {
           child: Row(
             children: [
               Text('Profile'),
+              const Spacer(),
               ElevatedButton(
                 onPressed: () => FirebaseAuth.instance.signOut(), 
                 child: const Text('Logout'),

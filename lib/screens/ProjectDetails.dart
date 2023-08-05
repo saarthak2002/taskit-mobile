@@ -216,6 +216,17 @@ class _ProjectDetailsState extends State<ProjectDetails> {
                   ),
                 ),
                 Container(
+                  margin: const EdgeInsets.only(top: 3),
+                  child: const Text(
+                    'Visit the task.it web app to edit task categories',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w300,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+                Container(
                   margin: EdgeInsets.only(top: 10),
                   child: ElevatedButton(
                     onPressed: () {
