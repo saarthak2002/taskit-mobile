@@ -204,6 +204,12 @@ class _ProfileState extends State<Profile> {
                       future: collabs,
                       builder: (BuildContext context, AsyncSnapshot snapshot) {
                         if(snapshot.hasData) {
+                          if(snapshot.data.length == 0) {
+                            return Container(
+                              margin: const EdgeInsets.all(20),
+                              child: const Center(child: Text('You have no collaborations')),
+                            );
+                          }
                           return Container(
                             margin: const EdgeInsets.only(left: 20, right: 20, top:10),
                             height: 50,
