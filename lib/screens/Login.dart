@@ -86,6 +86,20 @@ class _LoginState extends State<Login> {
                 text: "Continue with Google",
                 onPressed: () {signInWithGoogle();},
               ),
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  alignment: Alignment.bottomCenter,
+                  child: const Text(
+                    'Made with \u2661 by Saarthak Gupta \u00a9 2023',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: Color.fromARGB(220, 0, 0, 0),
+                    )
+                  ),
+                ),
+              )
             ],
           ),
         ),
